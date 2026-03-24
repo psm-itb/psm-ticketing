@@ -46,7 +46,7 @@ Ga perlu instalasi software apa-apa kok, karena semua berjalan di browser. Senga
 nuevala-ticket-system/
 │
 ├── README.md        — ini yang lagi kalian baca (prosedur)
-├── Code.gs          — backend (pengirimann email, validasi tiket)
+├── Code.gs          — backend (pengiriman email, validasi tiket)
 └── Index.html       — frontend (khusus check-in)
 ```
 
@@ -58,7 +58,7 @@ Dua file utama (`Code.gs` dan `Index.html`) dimasukkan ke dalam satu Google Apps
 
 ### Langkah 1 — Siapkan Forms Pemesanan Tiket
 
-1. Bikin formulir pemesanan tiket konser pakai Google Forms.
+1. Bikin formulir pemesanan tiket konser pakai Google Forms. Ini referensinya: https://docs.google.com/forms/d/e/1FAIpQLSe9gWUw4iqsCd4N5AL-GSKYpwua6EC5Yv1DJIXgwkVd4a6RFg/viewform
 2. Atur Google Spreadsheetsnya dengan menambahkan beberapa kolom tambahan. Ini referensinya: https://docs.google.com/spreadsheets/d/127yCm616OPmflOkJKXFi2eSzG21IKrHOT0IRCE6n77I/edit?gid=1961351188#gid=1961351188
 3. Pastikan pertanyaan-pertanyaannya persis sama. Urutan kolom tidak harus sama persis, tetapi nama kolomnya harus identik karakter per karakter. 
 4. Kalau mau ubah pertanyaannya, jangan lupa ubah di kode program (lebih jelasnya liat video)
