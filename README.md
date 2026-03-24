@@ -1,41 +1,38 @@
-Ini adalah sistem pengiriman dan validasi pemesanan tiket berbasis Google Forms, Google Spreadsheets, Google Apps Script, dan interface web sederhana. Ga perlu server eksternal atau langganan berbayar. Gratis tis tis dan made in-house.
+# Nuevala Ticket System
+
+> **Since Nuevala 2024** — for upcoming PSM-ITB concerts.
+
+Sistem pengiriman dan validasi tiket berbasis Google Forms, Google Spreadsheets, dan Google Apps Script. Tidak perlu server eksternal atau langganan berbayar.
+
+*Dokumentasi ini ditulis untuk generasi panitia berikutnya. Jaga agar tetap akurat jika ada perubahan sistem.*
 
 ---
 
 ## Daftar Isi
 
 - [Gambaran Sistem](#gambaran-sistem)
-- [Prasyarat](#prasyarat)
 - [Struktur File](#struktur-file)
 - [Cara Instalasi](#cara-instalasi)
 - [Cara Penggunaan](#cara-penggunaan)
 - [Format Data di Spreadsheet](#format-data-di-spreadsheet)
 - [FAQ](#faq)
-- [Kontak dan Kepemilikan](#kontak-dan-kepemilikan)
+- [Kontak](#kontak)
 
 ---
 
 ## Gambaran Sistem
 
-Cara kerja sistem ini mirip mesen tiket pesawat atau tiket travel pulang ke Jakarta via Traveloka:
-
 **Tahap 1 — Pemesanan Tiket**
 
 1. Pembeli memesan tiket via Google Forms
-2. Pembayaran tiket diverifikasi oleh bendahara via Google Spreadsheets (centang checkbox secara manual)
-3. Panitia ticketing menjalankan script dari menu di Google Spreadsheets dengan klik **Pengiriman Email** > **Kirim Email Tiket**
-4. Sistem akan secara otomatis mengirimkan email ke semua pembeli yang sudah terverifikasi. Isinya: tiket digital, QR code, dan kode alfanumerik 4 karakter
+2. Bendahara memverifikasi pembayaran via Google Spreadsheets (centang checkbox secara manual)
+3. Panitia ticketing menjalankan **Pengiriman Email** > **Kirim Email Tiket** dari menu di Spreadsheets
+4. Sistem otomatis mengirim email ke semua pembeli yang terverifikasi — berisi tiket digital, QR code, dan kode alfanumerik 4 karakter
 
 **Tahap 2 — Check-In**
 
-1. Pada Hari-H, panitia membuka halaman web scanner di perangkat masing-masing (bisa via HP, tablet, laptop, terserah)
-2. Check-In bisa dilakukan dengan dua cara: scan QR code pakai kamera atau input kode 4 karakter secara manual
-
----
-
-## Prasyarat
-
-Ga perlu instalasi software apa-apa kok, karena semua berjalan di browser. Sengaja dibuat spt ini biar ga ribet.
+1. Panitia membuka halaman web scanner di perangkat masing-masing (HP, tablet, laptop — bebas)
+2. Check-in bisa dilakukan dengan **scan QR code** atau **input kode 4 karakter** secara manual
 
 ---
 
@@ -44,47 +41,42 @@ Ga perlu instalasi software apa-apa kok, karena semua berjalan di browser. Senga
 ```
 nuevala-ticket-system/
 │
-├── README.md        — ini yang lagi kalian baca (prosedur)
-├── Code.gs          — backend (pengiriman email, validasi tiket)
-└── Index.html       — frontend (khusus check-in)
+├── README.md        — dokumentasi (ini)
+├── Code.gs          — backend: pengiriman email & validasi tiket
+└── Index.html       — frontend: halaman check-in hari-H
 ```
 
-Dua file utama (`Code.gs` dan `Index.html`) dimasukkan ke dalam satu Google Apps Script project yang terhubung ke Google Spreadsheets.
+Kedua file utama (`Code.gs` dan `Index.html`) dimasukkan ke satu Google Apps Script project yang terhubung ke Google Spreadsheets.
 
 ---
 
 ## Cara Instalasi
 
-### Langkah 1 — Siapkan Forms Pemesanan Tiket
+### Langkah 1 — Siapkan Google Forms & Spreadsheets
 
-1. Bikin formulir pemesanan tiket konser pakai Google Forms. Ini referensinya: https://docs.google.com/forms/d/e/1FAIpQLSe9gWUw4iqsCd4N5AL-GSKYpwua6EC5Yv1DJIXgwkVd4a6RFg/viewform
-2. Atur Google Spreadsheetsnya dengan menambahkan beberapa kolom tambahan. Ini referensinya: https://docs.google.com/spreadsheets/d/127yCm616OPmflOkJKXFi2eSzG21IKrHOT0IRCE6n77I/edit?gid=1961351188#gid=1961351188
-3. Pastikan pertanyaan-pertanyaannya persis sama. Urutan kolom tidak harus sama persis, tetapi nama kolomnya harus identik karakter per karakter
-4. Kalau mau ubah pertanyaannya, jangan lupa ubah di kode program (lebih jelasnya liat video)
+1. Buat formulir pemesanan tiket di Google Forms — [lihat contoh formulir →](https://docs.google.com/forms/d/e/1FAIpQLSe9gWUw4iqsCd4N5AL-GSKYpwua6EC5Yv1DJIXgwkVd4a6RFg/viewform)
+2. Tambahkan kolom-kolom tambahan di Google Spreadsheets — [lihat contoh spreadsheet →](https://docs.google.com/spreadsheets/d/127yCm616OPmflOkJKXFi2eSzG21IKrHOT0IRCE6n77I/edit?gid=1961351188#gid=1961351188)
+3. Pastikan nama pertanyaan persis sama karakter per karakter (urutan kolom boleh berbeda)
+4. Jika ada perubahan pertanyaan, sesuaikan juga di `Code.gs`
 
 ### Langkah 2 — Buka Apps Script
 
-1. Di Google Spreadsheets, klik menu **Ekstensi**
-2. Pilih **Apps Script**
-3. Tab baru akan terbuka dengan editor script
+1. Di Google Spreadsheets, klik **Ekstensi** > **Apps Script**
+2. Tab baru akan terbuka dengan editor script
 
 ### Langkah 3 — Masukkan Kode
 
-1. Hapus semua isi file `Code.gs` yang ada di editor
-2. Copy seluruh kode file `Code.gs` dari sini, lalu paste ke editor
-3. Klik ikon **+** di sebelah tab file untuk membuat file baru
-4. Beri nama file baru: `Index.html`
-5. Hapus semua isi file, lalu copy seluruh isi file `Index.html` dari sini dan paste ke editor
+1. Hapus isi `Code.gs` yang ada, lalu paste seluruh isi file `Code.gs` dari repo ini
+2. Klik ikon **+** untuk membuat file baru, beri nama `Index.html`
+3. Hapus isinya, lalu paste seluruh isi file `Index.html` dari repo ini
 
-### Langkah 4 — Save dan Izinkan Akses
+### Langkah 4 — Simpan & Izinkan Akses
 
-1. Tekan `Ctrl+S` untuk save
-2. Kembali ke tab Google Spreadsheets, lalu refresh
-3. Setelah halaman direfresh, akan muncul menu baru di sebelah **Help** judulnya **Pengiriman Email**
-4. Klik **Pengiriman Email**, pilih **Kirim Email Tiket**
-5. Google akan minta izin akses. Klik **Lanjutkan**, pilih akun Google yang digunakan, klik **Izinkan**
-6. Izin hanya akan diminta sekali
-7. Sistem siap digunakan
+1. Tekan `Ctrl+S` untuk menyimpan, lalu refresh tab Spreadsheets
+2. Menu baru **Pengiriman Email** akan muncul di sebelah **Help**
+3. Klik **Pengiriman Email** > **Kirim Email Tiket**
+4. Ikuti prompt izin akses Google — klik **Lanjutkan**, pilih akun, klik **Izinkan**
+5. Izin hanya diminta sekali. Sistem siap digunakan.
 
 ---
 
@@ -92,92 +84,106 @@ Dua file utama (`Code.gs` dan `Index.html`) dimasukkan ke dalam satu Google Apps
 
 ### Mengirim Email Tiket
 
-1. Beberapa hal yang bisa dicuekin:
-   - Tercentang atau tidaknya kolom `Validasi Bukti Pembayaran` itu terserah bendahara. Kalau memang belum dicentang, berarti pembayarannya belum diverifikasi oleh bendahara. Atau mungkin sudah diverifikasi bendahara, tapi suspicious. Ini ga perlu dikhawatirkan oleh panitia ticketing
-   - Kalau memang tiketnya belum pernah dikirimkan, kolom `Status Pengiriman` pada baris tersebut akan kosong. Ini ga perlu dikhawatirkan panitia ticketing
-2. Di Google Spreadsheets, klik **Pengiriman Email** > **Kirim Email Tiket**
-3. Tunggu hingga muncul notifikasi yang menampilkan jumlah email terkirim dan gagal
-4. Kolom `Status Pengiriman` akan terisi `Terkirim` secara otomatis untuk baris yang berhasil
+1. Klik **Pengiriman Email** > **Kirim Email Tiket** di Google Spreadsheets
+2. Tunggu notifikasi jumlah email terkirim dan gagal
+3. Kolom `Status Pengiriman` akan otomatis terisi `Terkirim` untuk baris yang berhasil
 
-Skrip hanya memproses baris yang memenuhi kedua syarat di atas — baris yang sudah `Terkirim` akan dilewati secara otomatis.
+> Baris yang belum punya `Validasi Bukti Pembayaran` atau sudah berstatus `Terkirim` akan dilewati otomatis.
 
 ---
 
-### Menggunakan Scanner di Hari-H
+### Scanner Hari-H
 
 **Membuka halaman scanner:**
 
-1. Buka Apps Script dari Google Spreadsheets (**Ekstensi** > **Apps Script**)
+1. Buka Apps Script (**Ekstensi** > **Apps Script**)
 2. Klik **Terapkan** > **Kelola Penerapan**
-3. Jika belum ada penerapan, klik **Penerapan Baru**
-   - Pilih tipe: **Aplikasi Web**
+3. Jika belum ada, klik **Penerapan Baru**:
+   - Tipe: **Aplikasi Web**
    - Jalankan sebagai: akun Google Anda
-   - Siapa yang dapat mengakses: **Siapa saja** agar panitia lain dapat membuka tanpa login
-4. Salin URL yang diberikan. Simpen URL ini — URL inilah yang dibagikan ke panlap
+   - Akses: **Siapa saja**
+4. Salin URL yang diberikan — ini yang dibagikan ke seluruh panitia lapangan
 
 **Memvalidasi tiket:**
 
-1. Buka URL scanner di browser perangkat (HP, laptop, tab, bebas)
-2. Isi kolom **Nama Penukar** dengan nama si penukar tiket (sometimes bukan penonton, tapi dia nitip temennya untuk nukerin)
-3. Untuk scan QR code: klik **Mulai Scan**, arahkan kamera ke QR code pada email tiket pembeli
-4. Untuk kode manual: ketik 4 karakter kode pada kolom yang tersedia, lalu klik **Verifikasi**
+1. Buka URL scanner di browser perangkat
+2. Isi kolom **Nama Penukar**
+3. Scan QR code via kamera, atau ketik kode 4 karakter lalu klik **Verifikasi**
 
-Hasil validasi akan tampil langsung di layar:
-- Hijau: tiket valid dan berhasil divalidasi
-- Kuning: tiket sudah pernah divalidasi sebelumnya (tidak boleh masuk lagi)
-- Merah: data tidak ditemukan atau kode salah (tiati nih boongin panitia)
+| Warna | Arti |
+|-------|------|
+| 🟢 Hijau | Tiket valid, berhasil divalidasi |
+| 🟡 Kuning | Tiket sudah pernah divalidasi sebelumnya |
+| 🔴 Merah | Data tidak ditemukan atau kode salah |
 
 ---
 
 ## Format Data di Spreadsheet
 
 | Kolom | Diisi saat |
-|---|---|
+|-------|------------|
 | `Kode Alfanumerik` | Pertama kali email dikirim |
 | `Status Pengiriman` | Setelah email berhasil atau gagal dikirim |
 | `Status Validasi` | Setelah tiket divalidasi di pintu masuk |
 | `Waktu Validasi` | Bersamaan dengan status validasi |
-| `Keterangan` | Berisi nama panitia yang memvalidasi |
+| `Keterangan` | Nama panitia yang memvalidasi |
 
 ---
 
 ## FAQ
 
-**Email gagal terkirim. Gimana?**
-Kolom `Status Pengiriman` pada baris tersebut akan terisi `Gagal`. Kosongin lagi nilai di kolom itu, lalu jalankan **Pengiriman Email** > **Kirim Email Tiket** lagi. Baris yang gagal akan diproses ulang.
-
-**Berapa banyak email yang bisa dikirim dalam satu hari?**
-Google membatasi pengiriman melalui Apps Script sebanyak 100 email per hari untuk akun Google biasa. Kalau pesanan lebih dari itu, cicil pengirimannya di hari berbeda.
-
-**QR code tidak muncul di email yang diterima pembeli.**
-QR code dibuat oleh layanan pihak ketiga saat email dikirim. Kalau layanan itu lagi down, QR code-nya ga kebuat tapi emailnya tetap terkirim. Tenang — kode alfanumerik 4 karakter di bagian bawah email tetap berfungsi penuh sebagai pengganti.
-
-**Kamera tidak bisa dibuka saat scan.**
-Halaman scanner akan menampilkan instruksi izin kamera sesuai perangkat yang digunakan. Kalau tetap ga bisa, pakai jalur kode manual saja — minta pembeli tunjukkan kode 4 karakter dari emailnya.
-
-**Pembeli mengklaim belum masuk tapi status validasinya sudah `Valid`.**
-Berarti tiketnya sudah discan sebelumnya. Kolom `Keterangan` di spreadsheet mencatat nama panitia yang melakukan validasi, dan kolom `Waktu Validasi` mencatat waktunya. Gunakan kedua informasi itu untuk menelusuri kejadian.
-
-**Gimana cara ganti gambar banner tiket di email?**
-Gambar banner disimpan di Google Drive. Unggah gambar baru, ubah aksesnya menjadi **Siapa saja yang memiliki link dapat melihat**, lalu salin ID file dari URL-nya (bagian setelah `/d/` dan sebelum `/view`). Buka `Code.gs`, cari fungsi `getTicketImageBlob`, dan ganti ID lama dengan ID baru sesuai tier tiketnya.
-
-**Gimana cara ubah informasi acara (tanggal, tempat, kontak) di email?**
-Buka `Code.gs` dan cari fungsi `buildEmailHtml`. Informasi tanggal, tempat, dan nomor kontak tertulis langsung di dalam fungsi tersebut. Ubah teksnya, lalu save.
-
-**Gimana kalau nama kolom di spreadsheet perlu diubah?**
-Perubahan yang sama harus dilakukan di `Code.gs`. Cari string nama kolom yang sesuai di dalam kode dan perbarui nilainya agar tetap cocok.
+**Q: Email gagal terkirim. Gimana?**
+A: Kolom `Status Pengiriman` akan terisi `Gagal`. Kosongin nilai di kolom tersebut, lalu jalankan ulang **Pengiriman Email** > **Kirim Email Tiket**. Baris yang gagal akan diproses kembali.
 
 ---
 
-## Kontak dan Kepemilikan
+**Q: Berapa banyak email yang bisa dikirim dalam satu hari?**
+A: Google membatasi 100 email per hari untuk akun biasa. Jika pesanan lebih dari itu, cicil pengiriman di hari berbeda.
 
-Sistem ini dibuat untuk keperluan internal PSM-ITB sejak Nuevala 2024.
+---
+
+**Q: QR code tidak muncul di email pembeli.**
+A: QR code dibuat oleh layanan pihak ketiga saat pengiriman. Jika layanan sedang down, QR code tidak terbuat — tapi email tetap terkirim. Kode alfanumerik 4 karakter tetap berfungsi penuh sebagai pengganti.
+
+---
+
+**Q: Kamera tidak bisa dibuka saat scan.**
+A: Halaman scanner menampilkan instruksi izin kamera sesuai perangkat. Jika tetap tidak bisa:
+1. Cek izin kamera di pengaturan browser
+2. Jika masih gagal, gunakan jalur kode manual — minta pembeli tunjukkan kode 4 karakter dari emailnya
+
+---
+
+**Q: Pembeli mengklaim belum masuk tapi status validasinya sudah `Valid`.**
+A: Tiketnya sudah discan sebelumnya. Untuk penelusuran:
+1. Cek kolom `Keterangan` — berisi nama panitia yang memvalidasi
+2. Cek kolom `Waktu Validasi` — berisi waktu kejadian
+
+---
+
+**Q: Gimana cara ganti gambar banner tiket di email?**
+A:
+1. Unggah gambar baru ke Google Drive
+2. Ubah aksesnya menjadi **Siapa saja yang memiliki link dapat melihat**
+3. Salin ID file dari URL (bagian setelah `/d/` dan sebelum `/view`)
+4. Buka `Code.gs`, cari fungsi `getTicketImageBlob`
+5. Ganti ID lama dengan ID baru sesuai tier tiket
+
+---
+
+**Q: Gimana cara ubah informasi acara (tanggal, tempat, kontak) di email?**
+A: Buka `Code.gs`, cari fungsi `buildEmailHtml`. Informasi acara ditulis langsung di dalam fungsi tersebut — ubah teksnya lalu simpan.
+
+---
+
+**Q: Nama kolom di spreadsheet perlu diubah. Gimana?**
+A: Perubahan yang sama harus dilakukan di `Code.gs`. Cari string nama kolom yang sesuai di dalam kode dan perbarui nilainya.
+
+---
+
+## Kontak
 
 Untuk pertanyaan teknis terkait sistem, hubungi pengelola repositori:
-[@sundaysiagian](https://www.instagram.com/sundaysiagian/) di Instagram, atau Line ID **8ukitduri**.
 
-Untuk pertanyaan terkait tiket, hubungi **081263153382 (Indah)** via WhatsApp.
-
----
-
-*Dokumentasi ini ditulis untuk memudahkan generasi panitia berikutnya, bukan hanya pengguna saat ini. Jaga agar tetap akurat jika ada perubahan sistem.*
+[![Instagram](https://img.shields.io/badge/@sundaysiagian-E4405F?style=flat-square&logo=instagram&logoColor=white)](https://www.instagram.com/sundaysiagian/)
+[![Line](https://img.shields.io/badge/8ukitduri-00C300?style=flat-square&logo=line&logoColor=white)](https://line.me/ti/p/8ukitduri)
