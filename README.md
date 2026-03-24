@@ -1,10 +1,4 @@
-# Nuevala Ticket System
-
-> **Since Nuevala 2024** — for upcoming PSM-ITB concerts.
-
 Sistem pengiriman dan validasi tiket berbasis Google Forms, Google Spreadsheets, dan Google Apps Script. Tidak perlu server eksternal atau langganan berbayar.
-
-*Dokumentasi ini ditulis untuk generasi panitia berikutnya. Jaga agar tetap akurat jika ada perubahan sistem.*
 
 ---
 
