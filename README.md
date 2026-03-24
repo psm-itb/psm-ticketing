@@ -1,7 +1,7 @@
-Ini adalah sistem pengiriman dan validasi tiket berbasis Google Forms, Google Spreadsheets, dan Google Apps Script. 
-Ga perlu server eksternal atau langganan berbayar, gratis-tis-tis oleh dan untuk PSM-ITB.
-Kiranya Tuhan berkenan dengan website baru kita ada sistem ticketing yang lebih robust.
-Untuk sementara dan untuk musim kemarau, pake ini dulu ya.
+‣ Ini adalah sistem ticketing sederhana berbasis Google Forms, Google Spreadsheets, dan Google Apps Script.  
+‣ Ga perlu server eksternal atau langganan berbayar, gratis-tis-tis oleh dan untuk PSM-ITB.  
+‣ Kiranya Tuhan berkenan dengan website baru kita ada sistem ticketing yang lebih robust.  
+‣ Untuk sementara dan untuk musim kemarau, silakan pake sistem ini.
 
 ---
 
@@ -23,12 +23,12 @@ Untuk sementara dan untuk musim kemarau, pake ini dulu ya.
 
 1. Pembeli memesan tiket via Google Forms
 2. Bendahara memverifikasi pembayaran via Google Spreadsheets (centang checkbox secara manual)
-3. Panitia ticketing menjalankan **Pengiriman Email** > **Kirim Email Tiket** dari menu di Spreadsheets
-4. Sistem otomatis mengirim email ke semua pembeli yang terverifikasi — berisi tiket digital, QR code, dan kode alfanumerik 4 karakter
+3. Panitia ticketing klik menu **Pengiriman Email** > **Kirim Email Tiket** dari via Google Spreadsheets
+4. Sistem otomatis mengirim email ke semua pembeli yang terverifikasi, berisi tiket digital, QR code, dan kode alfanumerik 4 karakter
 
 **Tahap 2 — Check-In**
 
-1. Panitia membuka halaman web scanner di perangkat masing-masing (HP, tablet, laptop — bebas)
+1. Panitia membuka halaman web scanner di perangkat masing-masing (HP, tablet, laptop, terserah)
 2. Check-in bisa dilakukan dengan **scan QR code** atau **input kode 4 karakter** secara manual
 
 ---
@@ -38,7 +38,7 @@ Untuk sementara dan untuk musim kemarau, pake ini dulu ya.
 ```
 nuevala-ticket-system/
 │
-├── README.md        — dokumentasi (ini)
+├── README.md        — dokumentasi (ini yang lagi ente baca)
 ├── Code.gs          — backend: pengiriman email & validasi tiket
 └── Index.html       — frontend: halaman check-in hari-H
 ```
@@ -54,7 +54,7 @@ Kedua file utama (`Code.gs` dan `Index.html`) dimasukkan ke satu Google Apps Scr
 1. Buat formulir pemesanan tiket di Google Forms — [lihat contoh formulir →](https://docs.google.com/forms/d/e/1FAIpQLSe9gWUw4iqsCd4N5AL-GSKYpwua6EC5Yv1DJIXgwkVd4a6RFg/viewform)
 2. Tambahkan kolom-kolom tambahan di Google Spreadsheets — [lihat contoh spreadsheet →](https://docs.google.com/spreadsheets/d/127yCm616OPmflOkJKXFi2eSzG21IKrHOT0IRCE6n77I/edit?gid=1961351188#gid=1961351188)
 3. Pastikan nama pertanyaan persis sama karakter per karakter (urutan kolom boleh berbeda)
-4. Jika ada perubahan pertanyaan, sesuaikan juga di `Code.gs`
+4. Jika ada perubahan pertanyaan, sesuaikan juga di `Code.gs`. Lebih jelasnya ada di video tutorial.
 
 ### Langkah 2 — Buka Apps Script
 
@@ -129,58 +129,58 @@ Kedua file utama (`Code.gs` dan `Index.html`) dimasukkan ke satu Google Apps Scr
 
 ## FAQ
 
-**Q: Email gagal terkirim. Gimana?**
-A: Kolom `Status Pengiriman` akan terisi `Gagal`. Kosongin nilai di kolom tersebut, lalu jalankan ulang **Pengiriman Email** > **Kirim Email Tiket**. Baris yang gagal akan diproses kembali.
+**Q: Email gagal terkirim. Gimana?**  
+A: Kolom `Status Pengiriman` akan terisi `Gagal`. Hapus tulisan `Gagal` tersebut, lalu jalankan ulang **Pengiriman Email** > **Kirim Email Tiket**. Baris yang gagal akan diproses kembali.
 
 ---
 
-**Q: Berapa banyak email yang bisa dikirim dalam satu hari?**
-A: Google membatasi 100 email per hari untuk akun biasa. Jika pesanan lebih dari itu, cicil pengiriman di hari berbeda.
+**Q: Berapa banyak email yang bisa dikirim dalam satu hari?**  
+A: Google membatasi 100 email per hari untuk akun biasa. 
 
 ---
 
-**Q: QR code tidak muncul di email pembeli.**
-A: QR code dibuat oleh layanan pihak ketiga saat pengiriman. Jika layanan sedang down, QR code tidak terbuat — tapi email tetap terkirim. Kode alfanumerik 4 karakter tetap berfungsi penuh sebagai pengganti.
+**Q: QR code tidak muncul di email pembeli.**  
+A: QR code dibuat oleh layanan pihak ketiga saat pengiriman. Jika layanan sedang down, QR code ngga akan dibuat (tapi email tetap terkirim). Kode alfanumerik 4 karakter tetap berfungsi penuh sebagai pengganti.
 
 ---
 
-**Q: Kamera tidak bisa dibuka saat scan.**
-A: Halaman scanner menampilkan instruksi izin kamera sesuai perangkat. Jika tetap tidak bisa:
-1. Cek izin kamera di pengaturan browser
+**Q: Kamera tidak bisa dibuka saat scan.**  
+A: Halaman scanner harusnya menampilkan instruksi izin kamera sesuai perangkat. Jika tetap tidak bisa:
+1. Cek izin kamera di pengaturan browser  
 2. Jika masih gagal, gunakan jalur kode manual — minta pembeli tunjukkan kode 4 karakter dari emailnya
 
 ---
 
-**Q: Pembeli mengklaim belum masuk tapi status validasinya sudah `Valid`.**
-A: Tiketnya sudah discan sebelumnya. Untuk penelusuran:
-1. Cek kolom `Keterangan` — berisi nama panitia yang memvalidasi
+**Q: Pembeli mengklaim belum masuk tapi status validasinya sudah `Valid`.**  
+A: Artinya, tiket beliau sudah discan/dicheck-in oleh orang lain. Untuk penelusuran:  
+1. Cek kolom `Keterangan` — berisi nama panitia yang memvalidasi  
 2. Cek kolom `Waktu Validasi` — berisi waktu kejadian
 
 ---
 
-**Q: Gimana cara ganti gambar banner tiket di email?**
+**Q: Gimana cara ganti gambar banner tiket di email?**  
 A:
-1. Unggah gambar baru ke Google Drive
-2. Ubah aksesnya menjadi **Siapa saja yang memiliki link dapat melihat**
-3. Salin ID file dari URL (bagian setelah `/d/` dan sebelum `/view`)
-4. Buka `Code.gs`, cari fungsi `getTicketImageBlob`
+1. Unggah gambar baru ke Google Drive  
+2. Ubah aksesnya menjadi **Siapa saja yang memiliki link dapat melihat**  
+3. Salin ID file dari URL (bagian setelah `/d/` dan sebelum `/view`)  
+4. Buka `Code.gs`, cari fungsi `getTicketImageBlob`  
 5. Ganti ID lama dengan ID baru sesuai tier tiket
 
 ---
 
-**Q: Gimana cara ubah informasi acara (tanggal, tempat, kontak) di email?**
+**Q: Gimana cara ubah informasi acara (tanggal, tempat, kontak) di email?**  
 A: Buka `Code.gs`, cari fungsi `buildEmailHtml`. Informasi acara ditulis langsung di dalam fungsi tersebut — ubah teksnya lalu simpan.
 
 ---
 
-**Q: Nama kolom di spreadsheet perlu diubah. Gimana?**
+**Q: Nama kolom di spreadsheet perlu diubah. Gimana?**  
 A: Perubahan yang sama harus dilakukan di `Code.gs`. Cari string nama kolom yang sesuai di dalam kode dan perbarui nilainya.
 
 ---
 
 ## Kontak
 
-Untuk pertanyaan teknis terkait sistem, hubungi pengelola repositori:
+Untuk pertanyaan teknis terkait sistem, hubungi pemilik lapak:  
 
 [![Instagram](https://img.shields.io/badge/@sundaysiagian-E4405F?style=flat-square&logo=instagram&logoColor=white)](https://www.instagram.com/sundaysiagian/)
 [![Line](https://img.shields.io/badge/8ukitduri-00C300?style=flat-square&logo=line&logoColor=white)](https://line.me/ti/p/8ukitduri)
