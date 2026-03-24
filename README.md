@@ -1,5 +1,3 @@
-# NUEVALA 2026 — Sistem Tiket Digital
-
 Ini adalah sistem pengiriman dan validasi pemesanan tiket berbasis Google Forms, Google Spreadsheets, Google Apps Script, dan interface web sederhana. Ga perlu server eksternal atau langganan berbayar. Gratis tis tis dan made in-house.
 
 ---
