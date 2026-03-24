@@ -29,14 +29,14 @@ Cara kerja sistem ini mirip mesen tiket pesawat atau tiket travel pulang ke Jaka
 
 **Tahap 2 — Check-In**
 
-1. Pada Hari-H, panitia membuka halaman web scanner di perangkat masing-masing (bisa via HP)
+1. Pada Hari-H, panitia membuka halaman web scanner di perangkat masing-masing (bisa via HP, tablet, laptop, terserah)
 2. Check-In bisa dilakukan dengan dua cara: scan QR code pakai kamera atau input kode 4 karakter secara manual
 
 ---
 
 ## Prasyarat/Prerequisite
 
-Ga perlu instalasi software apa-apa kok. Semua berjalan di browser selama ada akun Google konsernya.
+Ga perlu instalasi software apa-apa kok, karena semmua berjalan di browser. Sengaja dibuat spt ini biar ga ribet.
 
 ---
 
