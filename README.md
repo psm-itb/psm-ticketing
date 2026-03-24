@@ -36,7 +36,7 @@ Cara kerja sistem ini mirip mesen tiket pesawat atau tiket travel pulang ke Jaka
 
 ## Prasyarat/Prerequisite
 
-Ga perlu instalasi software apa-apa kok, karena semmua berjalan di browser. Sengaja dibuat spt ini biar ga ribet.
+Ga perlu instalasi software apa-apa kok, karena semua berjalan di browser. Sengaja dibuat spt ini biar ga ribet.
 
 ---
 
