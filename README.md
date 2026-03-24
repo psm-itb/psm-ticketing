@@ -24,7 +24,7 @@ Cara kerja sistem ini mirip mesen tiket pesawat atau tiket travel pulang ke Jaka
 
 1. Pembeli memesan tiket via Google Forms
 2. Pembayaran tiket diverifikasi oleh bendahara via Google Spreadsheets (centang checkbox secara manual)
-3. Panitia ticketing menjalankan script dari menu di Google Spreadsheets dengan klik "Pengiriman Email" > "Kirim Email Tiket"
+3. Panitia ticketing menjalankan script dari menu di Google Spreadsheets dengan klik **Pengiriman Email** > **Kirim Email Tiket**
 4. Sistem akan secara otomatis mengirimkan email ke semua pembeli yang sudah terverifikasi. Isinya: tiket digital, QR code, dan kode alfanumerik 4 karakter
 
 **Tahap 2 — Check-In**
