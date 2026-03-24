@@ -2,8 +2,19 @@
 // HELPERS
 // ============================================================
 
+/**
+ * Menghasilkan kode alfanumerik unik sepanjang 4 karakter.
+ *
+ * Karakter yang dipakai sengaja dipilih untuk menghindari ambiguitas visual:
+ * huruf O dan angka 0 mirip, huruf I dan angka 1 juga mirip — jadi dikeluarkan.
+ * Tujuannya biar panitia dan pembeli ga salah baca kode saat hari-H.
+ *
+ * @param {Set} existingCodes - Kumpulan kode yang sudah ada di spreadsheet,
+ *                              supaya kode yang dihasilkan dijamin unik (tidak bentrok).
+ * @returns {string} Kode unik 4 karakter, huruf besar semua.
+ */
 function generateUniqueCode(existingCodes) {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // ambiguous chars removed: 0,O,1,I
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // karakter ambigu dihapus: 0, O, 1, I
   let code, attempts = 0;
   do {
     code = '';
@@ -13,6 +24,16 @@ function generateUniqueCode(existingCodes) {
   return code;
 }
 
+/**
+ * Mengambil gambar banner tiket dari Google Drive berdasarkan tier.
+ *
+ * Gambar disimpan di Google Drive (bukan di-embed langsung ke kode)
+ * supaya lebih gampang diganti tanpa perlu utak-atik kode.
+ * Cara ganti gambarnya ada di bagian FAQ di README.
+ *
+ * @param {string} tier - Jenis tiket: 'GOLD', 'SILVER', atau 'BRONZE' (case-insensitive).
+ * @returns {Blob|null} Blob gambar siap pakai, atau null kalau gagal diambil.
+ */
 function getTicketImageBlob(tier) {
   const urls = {
     'GOLD':   'https://drive.google.com/uc?export=view&id=1fMIsw6tT6oPX9946AcN7OWz3tJbsz-7w',
@@ -24,18 +45,40 @@ function getTicketImageBlob(tier) {
   try {
     return UrlFetchApp.fetch(url).getBlob().setName('ticket-banner.jpg');
   } catch(e) {
-    Logger.log('Failed to fetch image for tier ' + tier + ': ' + e);
+    Logger.log('Gagal mengambil gambar untuk tier ' + tier + ': ' + e);
     return null;
   }
 }
 
+/**
+ * Membuat isi HTML untuk email tiket yang dikirimkan ke pembeli.
+ *
+ * Fungsi ini menghasilkan dua blok utama:
+ *   1. Kartu tiket — menampilkan info acara, nama pembeli, show, jumlah, dan total
+ *   2. Blok QR code + kode alfanumerik — untuk penukaran tiket di pintu masuk
+ *
+ * Warna dan label tiket berbeda-beda tergantung tier (Gold, Silver, Bronze).
+ * Informasi acara (tanggal, tempat, kontak) ditulis langsung di sini —
+ * kalau ada perubahan, cari dan edit bagian tabel di dalam fungsi ini.
+ *
+ * @param {string}  nama      - Nama lengkap pembeli.
+ * @param {string}  show      - Show yang dipilih (misal: "Show 1 – Siang").
+ * @param {string}  jumlah    - Jumlah tiket yang dipesan.
+ * @param {string}  total     - Total pembayaran (akan diformat ke Rupiah).
+ * @param {string}  tier      - Jenis tiket: 'GOLD', 'SILVER', atau 'BRONZE'.
+ * @param {string}  kode      - Kode alfanumerik 4 karakter untuk verifikasi manual.
+ * @param {boolean} hasImage  - true kalau blob gambar banner berhasil diambil.
+ * @returns {string} String HTML lengkap untuk dikirim via MailApp.
+ */
 function buildEmailHtml(nama, show, jumlah, total, tier, kode, hasImage) {
+  // Konfigurasi tampilan per tier: warna latar, warna aksen, dan label
   const cfg = {
     GOLD:   { bg: '#070605', accent: '#ECC976', label: 'Exclusive Gold Access' },
     SILVER: { bg: '#2E3137', accent: '#72B0B6', label: 'Standard Silver Access' },
     BRONZE: { bg: '#413539', accent: '#D66E40', label: 'Bronze Access' }
   }[tier.toUpperCase()] || { bg: '#413539', accent: '#D66E40', label: 'Access' };
 
+  // Banner gambar hanya ditampilkan kalau blob-nya berhasil diambil
   const imgHtml = hasImage
     ? `<img src="cid:ticketBanner" width="400" style="display:block;width:100%;height:180px;object-fit:cover;" alt="${tier} Ticket">`
     : '';
@@ -50,6 +93,8 @@ function buildEmailHtml(nama, show, jumlah, total, tier, kode, hasImage) {
       <h2 style="margin:0 0 4px;font-size:28px;font-weight:300;color:white;">NUEVALA</h2>
       <p style="font-size:13px;opacity:0.7;margin:0 0 16px;">Voices Beyond The Walls</p>
       <p style="font-size:13px;opacity:0.9;margin:0 0 14px;">Dear <strong>${nama}</strong>, pembayaran Anda telah dikonfirmasi.</p>
+
+      <!-- Informasi acara — ubah di sini kalau ada perubahan tanggal, tempat, atau kontak -->
       <table style="width:100%;font-size:13px;color:white;border-collapse:collapse;">
         <tr><td style="opacity:0.6;padding:3px 12px 3px 0;white-space:nowrap;">Tanggal</td><td>Sabtu, 16 Mei 2026</td></tr>
         <tr><td style="opacity:0.6;padding:3px 12px 3px 0;white-space:nowrap;">Tempat</td><td>Aula Barat ITB, Jl. Ganesha No. 10</td></tr>
@@ -83,6 +128,13 @@ function buildEmailHtml(nama, show, jumlah, total, tier, kode, hasImage) {
 </div>`;
 }
 
+/**
+ * Memformat angka menjadi format Rupiah (Rp1.000.000,00).
+ * Dipakai untuk menampilkan kolom total pembayaran di dalam email.
+ *
+ * @param {string|number} value - Nilai yang akan diformat (boleh mengandung karakter non-angka).
+ * @returns {string} String dalam format Rupiah, atau nilai aslinya kalau parsing gagal.
+ */
 function formatRupiah(value) {
   const num = parseFloat(String(value).replace(/[^0-9]/g, ''));
   if (isNaN(num)) return value;
@@ -93,11 +145,31 @@ function formatRupiah(value) {
 // SEND EMAILS
 // ============================================================
 
+/**
+ * Fungsi utama pengiriman email tiket — dipanggil via menu Pengiriman Email > Kirim Email Tiket.
+ *
+ * Alur kerjanya:
+ *   1. Baca semua data dari spreadsheet aktif
+ *   2. Untuk setiap baris, cek dua syarat: pembayaran sudah diverifikasi (checkbox = true)
+ *      dan email belum pernah dikirim (Status Pengiriman bukan 'Terkirim')
+ *   3. Kalau belum punya kode alfanumerik, generate kode baru yang unik
+ *   4. Buat QR code via API pihak ketiga (qrserver.com)
+ *   5. Kirim email HTML dengan banner tier, QR code, dan kode alfanumerik
+ *   6. Tandai baris sebagai 'Terkirim' atau 'Gagal' di kolom Status Pengiriman
+ *
+ * Catatan penting:
+ *   - Google membatasi 100 email per hari untuk akun biasa. Kalau lebih, cicil di hari berbeda.
+ *   - Kalau QR code gagal dibuat (layanan down), email tetap terkirim — kode alfanumerik tetap berfungsi.
+ *   - Kalau status suatu baris adalah 'Gagal', kosongin kolom Status Pengiriman-nya
+ *     lalu jalankan ulang fungsi ini — baris tersebut akan diproses kembali.
+ */
 function sendEmailsFromSheet() {
   const sheet  = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const values = sheet.getDataRange().getValues();
   const header = values[0];
 
+  // Pemetaan nama kolom ke indeks — kalau nama kolom di spreadsheet berubah,
+  // perbarui string-string di bawah ini agar tetap cocok
   const col = {
     email:       header.indexOf('Email untuk pengiriman tiket'),
     nama:        header.indexOf('Nama Lengkap'),
@@ -110,13 +182,14 @@ function sendEmailsFromSheet() {
     kodeAlfa:    header.indexOf('Kode Alfanumerik')
   };
 
+  // Validasi awal: pastikan semua kolom yang dibutuhkan ada di spreadsheet
   const missing = Object.entries(col).filter(([_, v]) => v === -1).map(([k]) => k);
   if (missing.length) {
     SpreadsheetApp.getUi().alert('Kolom tidak ditemukan:\n' + missing.join('\n'));
     return;
   }
 
-  // Collect existing codes to avoid collisions
+  // Kumpulkan semua kode yang sudah ada supaya kode baru tidak bentrok
   const existingCodes = new Set(
     values.slice(1)
       .map(r => String(r[col.kodeAlfa]).trim().toUpperCase())
@@ -133,30 +206,33 @@ function sendEmailsFromSheet() {
     const jenis       = String(row[col.jenis]).trim().toUpperCase();
     const jumlah      = String(row[col.jumlah]).trim();
     const total       = String(row[col.total]).trim();
-    const bukti       = row[col.bukti];
+    const bukti       = row[col.bukti];           // true kalau checkbox sudah dicentang bendahara
     const statusKirim = String(row[col.statusKirim]).trim();
 
+    // Lewati baris yang: emailnya kosong, pembayarannya belum diverifikasi, atau sudah terkirim
     if (!email || bukti !== true || statusKirim === 'Terkirim') continue;
 
     try {
-      // Retrieve existing code or generate a new one
+      // Ambil kode yang sudah ada, atau generate baru kalau belum ada
       let kode = String(row[col.kodeAlfa]).trim().toUpperCase();
       if (kode.length !== 4) {
         kode = generateUniqueCode(existingCodes);
         existingCodes.add(kode);
         sheet.getRange(i + 1, col.kodeAlfa + 1).setValue(kode);
-        SpreadsheetApp.flush();
+        SpreadsheetApp.flush(); // simpan ke spreadsheet sekarang, jangan tunggu loop selesai
       }
 
-      // Fetch tier banner image
+      // Ambil gambar banner sesuai tier
       const tierBlob = getTicketImageBlob(jenis);
 
-      // Generate QR code blob
+      // Generate QR code dari layanan eksternal
+      // Data yang di-encode: nama, email, show, jumlah, total, dan kode alfanumerik
       const qrData = `NAMA=${nama}|EMAIL=${email}|SHOW=${show}|TIKET=${jumlah}|TOTAL=${total}|KODE=${kode}`;
       const qrBlob = UrlFetchApp.fetch(
         `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`
       ).getBlob().setName('qrcode.png');
 
+      // Gambar di-embed langsung ke dalam email (inline), bukan sebagai lampiran
       const inlineImages = { qrcode: qrBlob };
       if (tierBlob) inlineImages.ticketBanner = tierBlob;
 
@@ -170,13 +246,13 @@ function sendEmailsFromSheet() {
       sheet.getRange(i + 1, col.statusKirim + 1).setValue('Terkirim');
       SpreadsheetApp.flush();
       sentCount++;
-      Logger.log(`Sent to ${email} | tier: ${jenis} | kode: ${kode}`);
+      Logger.log(`Terkirim ke ${email} | tier: ${jenis} | kode: ${kode}`);
 
     } catch(e) {
       sheet.getRange(i + 1, col.statusKirim + 1).setValue('Gagal');
       SpreadsheetApp.flush();
       failCount++;
-      Logger.log(`Failed for ${email}: ${e}`);
+      Logger.log(`Gagal untuk ${email}: ${e}`);
     }
   }
 
@@ -187,6 +263,16 @@ function sendEmailsFromSheet() {
 // SHARED VALIDATION LOGIC
 // ============================================================
 
+/**
+ * Mengambil data lengkap dari spreadsheet aktif beserta pemetaan kolomnya.
+ * Fungsi ini dipakai bersama oleh validasi QR code maupun kode alfanumerik
+ * supaya tidak ada duplikasi kode yang sama di dua tempat.
+ *
+ * @returns {{ sheet: Sheet, values: Array[], col: Object }}
+ *   - sheet:  objek sheet aktif (untuk operasi tulis)
+ *   - values: semua baris data termasuk header
+ *   - col:    pemetaan nama kolom ke indeks angka
+ */
 function getSheetData() {
   const sheet  = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const values = sheet.getDataRange().getValues();
@@ -204,11 +290,36 @@ function getSheetData() {
   return { sheet, values, col };
 }
 
+/**
+ * Memvalidasi satu baris tiket dan menulis hasilnya ke spreadsheet.
+ *
+ * Kalau tiket belum pernah divalidasi:
+ *   - Kolom Status Validasi diisi 'Valid'
+ *   - Kolom Waktu Validasi diisi waktu sekarang
+ *   - Kolom Keterangan diisi nama panitia yang memvalidasi
+ *   - Baris diberi warna hijau sebagai penanda visual
+ *
+ * Kalau tiket sudah pernah divalidasi sebelumnya:
+ *   - Tidak ada perubahan data di spreadsheet
+ *   - Fungsi mengembalikan status 'already_valid' beserta info waktu validasi sebelumnya
+ *   - Ini yang muncul sebagai kotak kuning di halaman scanner
+ *
+ * @param {Sheet}   sheet       - Objek sheet aktif.
+ * @param {Array[]} values      - Semua data baris dari spreadsheet.
+ * @param {Object}  col         - Pemetaan nama kolom ke indeks.
+ * @param {number}  i           - Indeks baris yang akan divalidasi (0-based dari array values).
+ * @param {string}  namaPenukar - Nama panitia yang melakukan validasi, dicatat di kolom Keterangan.
+ * @returns {{ status: string, message: string }}
+ *   status bisa berupa: 'success', 'already_valid'
+ */
 function validateRow(sheet, values, col, i, namaPenukar) {
   const row    = values[i];
   const nama   = String(row[col.nama]).trim();
   const show   = String(row[col.show]).trim();
   const jumlah = String(row[col.jumlah]).trim();
+
+  // Cek langsung dari spreadsheet (bukan dari cache values) untuk menghindari kondisi balapan
+  // kalau dua panitia scan tiket yang sama di waktu yang hampir bersamaan
   const currentStatus = sheet.getRange(i + 1, col.statusValid + 1).getValue();
 
   if (currentStatus === 'Valid') {
@@ -232,6 +343,7 @@ function validateRow(sheet, values, col, i, namaPenukar) {
   if (keteranganCol !== -1) {
     sheet.getRange(i + 1, keteranganCol + 1).setValue('Ditukar oleh: ' + namaPenukar);
   }
+  // Warna hijau sebagai penanda visual baris yang sudah divalidasi
   sheet.getRange(i + 1, 1, 1, sheet.getLastColumn()).setBackground('#d4edda');
   SpreadsheetApp.flush();
 
@@ -245,6 +357,21 @@ function validateRow(sheet, values, col, i, namaPenukar) {
 // QR CODE VALIDATION
 // ============================================================
 
+/**
+ * Memproses data hasil scan QR code dari halaman scanner (Index.html).
+ *
+ * QR code yang di-scan akan menghasilkan string dengan format:
+ *   NAMA=...|EMAIL=...|SHOW=...|TIKET=...|TOTAL=...|KODE=...
+ *
+ * Fungsi ini mem-parsing string tersebut, mencari baris yang cocok
+ * di spreadsheet berdasarkan kombinasi email + nama + show + jumlah + total,
+ * lalu memanggil validateRow() untuk menyelesaikan proses validasi.
+ *
+ * @param {string} qrData      - String hasil decode QR code.
+ * @param {string} namaPenukar - Nama panitia yang melakukan scan.
+ * @returns {{ status: string, message: string }}
+ *   status bisa berupa: 'success', 'already_valid', 'not_found', 'error'
+ */
 function processQrCodeData(qrData, namaPenukar) {
   if (!qrData || typeof qrData !== 'string' || !qrData.trim()) {
     return { status: 'error', message: 'Data QR kosong atau tidak valid.' };
@@ -257,6 +384,7 @@ function processQrCodeData(qrData, namaPenukar) {
   const missing = Object.entries(col).filter(([_, v]) => v === -1).map(([k]) => k);
   if (missing.length) return { status: 'error', message: 'Kolom tidak ditemukan: ' + missing.join(', ') };
 
+  // Parsing string QR code jadi objek key-value
   const parsed = {};
   qrData.split('|').forEach(item => {
     const eq = item.indexOf('=');
@@ -268,6 +396,7 @@ function processQrCodeData(qrData, namaPenukar) {
     return { status: 'error', message: 'Format QR tidak sesuai atau data tidak lengkap.' };
   }
 
+  // Cari baris yang cocok berdasarkan kombinasi 5 field — lebih aman dari sekadar email saja
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
     if (
@@ -284,6 +413,20 @@ function processQrCodeData(qrData, namaPenukar) {
   return { status: 'not_found', message: `Data tidak ditemukan: ${NAMA} | ${EMAIL} | ${SHOW}` };
 }
 
+/**
+ * Memproses verifikasi tiket via kode alfanumerik 4 karakter (jalur manual).
+ *
+ * Dipakai ketika QR code tidak bisa dibaca (kamera bermasalah, printout blur, dsb).
+ * Pembeli cukup tunjukkan kode 4 karakter dari email mereka, panitia input secara manual.
+ *
+ * Pencarian dilakukan dengan membandingkan kode yang diinput (diubah ke huruf besar)
+ * dengan kolom Kode Alfanumerik di setiap baris spreadsheet.
+ *
+ * @param {string} code        - Kode 4 karakter yang diinput panitia.
+ * @param {string} namaPenukar - Nama panitia yang melakukan verifikasi.
+ * @returns {{ status: string, message: string }}
+ *   status bisa berupa: 'success', 'already_valid', 'not_found', 'error'
+ */
 function processAlphanumericCode(code, namaPenukar) {
   if (!code || typeof code !== 'string' || !code.trim()) {
     return { status: 'error', message: 'Kode kosong atau tidak valid.' };
@@ -314,6 +457,13 @@ function processAlphanumericCode(code, namaPenukar) {
 // BOILERPLATE
 // ============================================================
 
+/**
+ * Dipanggil otomatis oleh Google Apps Script saat URL aplikasi web diakses.
+ * Fungsi ini me-render Index.html sebagai halaman scanner untuk panitia hari-H.
+ *
+ * URL aplikasi web didapat dari menu Terapkan > Kelola Penerapan di Apps Script.
+ * Cara lengkapnya ada di bagian "Scanner Hari-H" di README.
+ */
 function doGet() {
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
@@ -321,6 +471,12 @@ function doGet() {
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 }
 
+/**
+ * Dipanggil otomatis oleh Google Apps Script setiap kali spreadsheet dibuka.
+ * Fungsi ini menambahkan menu "Pengiriman Email" ke menu bar spreadsheet
+ * supaya panitia ticketing bisa mengirim email cukup dari spreadsheet,
+ * tanpa perlu buka Apps Script editor sama sekali.
+ */
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('Pengiriman Email')
