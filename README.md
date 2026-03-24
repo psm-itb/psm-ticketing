@@ -1,4 +1,7 @@
-Sistem pengiriman dan validasi tiket berbasis Google Forms, Google Spreadsheets, dan Google Apps Script. Tidak perlu server eksternal atau langganan berbayar.
+Ini adalah sistem pengiriman dan validasi tiket berbasis Google Forms, Google Spreadsheets, dan Google Apps Script. 
+Ga perlu server eksternal atau langganan berbayar, gratis-tis-tis oleh dan untuk PSM-ITB.
+Kiranya Tuhan berkenan dengan website baru kita ada sistem ticketing yang lebih robust.
+Untuk sementara dan untuk musim kemarau, pake ini dulu ya.
 
 ---
 
