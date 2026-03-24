@@ -72,10 +72,10 @@ Dua file utama (`Code.gs` dan `Index.html`) dimasukkan ke dalam satu Google Apps
 ### Langkah 3 — Masukkan Kode
 
 1. Hapus semua isi file `Code.gs` yang ada di editor 
-2. Copy seluruh kode file `Code.gs` dari sini, dan paste ke editor
+2. Copy seluruh kode file `Code.gs` dari sini, lalu paste ke editor
 3. Klik ikon **+** di sebelah tab file untuk membuat file baru
 4. Beri nama file baru: `Index.html`
-5. Hapus isi default, lalu copy seluruh isi file `Index.html` dari sini dan paste ke sana
+5. Hapus semua isi file, lalu copy seluruh isi file `Index.html` dari sini dan paste ke editor
 
 ### Langkah 4 — Save dan Izinkan Akses
 
